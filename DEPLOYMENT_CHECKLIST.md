@@ -6,7 +6,7 @@
 - [x] `npx tsc --noEmit` passes with no type errors
 - [x] `npm test` passes (16/16)
 - [ ] Firestore security rules reviewed (currently test mode, open read/write; acceptable for this capstone's scope, flagged as a known limitation, not silently ignored)
-- [ ] `ANTHROPIC_API_KEY` added to Vercel project environment variables (never committed to the repo, never in `.env.example` beyond a blank placeholder)
+- [ ] `GEMINI_API_KEY` added to Vercel project environment variables (never committed to the repo, never in `.env.example` beyond a blank placeholder)
 - [ ] Firebase config values added to Vercel project environment variables (`VITE_FIREBASE_*`)
 
 ## Deploy
@@ -18,7 +18,7 @@
 ## Post-deploy verification
 
 - [ ] Add a task manually on the live URL, confirm it persists after refresh
-- [ ] Click "AI triage" on the live URL, confirm a real suggestion comes back (this confirms `ANTHROPIC_API_KEY` is correctly set in Vercel, not just locally)
+- [ ] Click "AI triage" on the live URL, confirm a real suggestion comes back (this confirms `GEMINI_API_KEY` is correctly set in Vercel, not just locally)
 - [ ] Temporarily test the failure path: if possible, confirm the app still works and shows the fallback error message if the AI call fails (e.g. by checking behavior matches the tested fallback in `TaskForm.test.tsx`)
 - [ ] Run Lighthouse against the live URL (Chrome DevTools > Lighthouse), record scores below
 - [ ] Run an accessibility audit (axe DevTools or WAVE) against the live URL, record findings below
