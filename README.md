@@ -1,5 +1,4 @@
 # Backlog Tracker
-**https://backlog-tracker-app.vercel.app/**
 
 A small React + TypeScript app for triaging a frontend work backlog: not just a todo list, it tracks how long items have sat untouched, flags what's gone stale, and sorts by what actually needs attention rather than by insertion order. Includes an AI-assisted triage feature that turns a messy, dashed-off task description into a clear title and a reasoned priority.
 
@@ -50,7 +49,7 @@ api/
 
 **What it does:** the "AI triage" button sends the raw, as-typed task title to an LLM via a serverless function, and gets back a cleaned-up title, a suggested priority (low/normal/urgent), and one sentence of reasoning for that priority.
 
-**Provider:** Google Gemini (`gemini-2.5-flash`), called from `api/triage.js`. The assignment brief explicitly allows "Claude API... or another LLM you prefer"; I initially built this against the Claude API, then switched to Gemini because Anthropic's API has no standing free tier (a one-time signup credit that wasn't available on my account) and Gemini's free tier via Google AI Studio has no card requirement and doesn't expire. The JSON contract the function returns is provider-agnostic (`{ title, priority, reasoning }`), so switching providers meant changing only `api/triage.js`, nothing in the client, the hook, or the tests needed to change.
+**Provider:** Google Gemini (`gemini-flash-lite-latest`, a Google-maintained alias rather than a pinned version), called from `api/triage.js`. The assignment brief explicitly allows "Claude API... or another LLM you prefer"; I initially built this against the Claude API, then switched to Gemini because Anthropic's API has no standing free tier (a one-time signup credit that wasn't available on my account) and Gemini's free tier via Google AI Studio has no card requirement and doesn't expire. The JSON contract the function returns is provider-agnostic (`{ title, priority, reasoning }`), so switching providers meant changing only `api/triage.js`, nothing in the client, the hook, or the tests needed to change. Also worth noting: the first pinned model (`gemini-2.5-flash`) returned a live 404 in production ("no longer available to new users") despite working in local testing, since Google restricts some model versions for new API keys specifically. Diagnosed via Vercel's runtime logs, then fixed by switching to the `-latest` alias so the app tracks Google's current recommended model instead of a version that can be deprecated out from under it.
 
 **Why this and not a chatbot:** the actual problem is that backlog entries get written in a rush ("nav thing broken on phones asap") and don't carry enough structure to triage consistently later. This feature fixes that specific gap, structure and priority reasoning, rather than being a general-purpose assistant bolted onto an unrelated app.
 
