@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { Priority } from '../types/task';
+import { useState } from "react";
+import type { Priority } from "../types/task";
 
 interface TriageResult {
   title: string;
@@ -15,16 +15,19 @@ export function useTriage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/triage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: rawTitle }),
+      const res = await fetch("/api/triage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rawInput: rawTitle }),
       });
-      if (!res.ok) throw new Error('non-ok response');
+      if (!res.ok) throw new Error("non-ok response");
       const data = await res.json();
       return data as TriageResult;
-    } catch {
-      setError('AI suggestion unavailable right now, you can still add the task manually.');
+    } catch (err) {
+      console.error("Triage suggestion failed:", err);
+      setError(
+        "AI suggestion unavailable right now, you can still add the task manually.",
+      );
       return null;
     } finally {
       setLoading(false);
