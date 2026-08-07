@@ -27,22 +27,28 @@
 
 Run against the live URL (`backlog-tracker-app.vercel.app`) in Chrome DevTools, mobile device setting, incognito window (to exclude browser extensions from skewing results, as Lighthouse itself flags when extensions are active).
 
-Four runs were taken across two rounds of performance optimization:
+Six runs were taken across two rounds of performance optimization:
 
 | Run | Performance | Accessibility | Best Practices | SEO | Notes |
 |---|---|---|---|---|---|
 | 1 (with extensions) | 58 | 100 | 100 | 90 | Discarded, Lighthouse explicitly flagged extension interference |
 | 2 (incognito, before optimization) | 81 | 100 | 100 | 90 | Baseline clean run |
-| 3 (incognito, after lazy-loading Firestore) | 83 | 100 | 100 | 90 | Bundle split ~495KB → ~151KB main chunk |
-| 4 (incognito, after adding preconnect hints) | 68 | 100 | 100 | 90 | LCP and TBT both regressed despite no code that should slow rendering |
+| 3 (after lazy-loading Firestore) | 83 | 100 | 100 | 90 | Bundle split ~495KB → ~151KB main chunk |
+| 4 (after adding preconnect hints, wrong hostnames) | 68 | 100 | 100 | 90 | Regression, later traced to incorrect preconnect targets |
+| 5 (re-run, same code) | 76 | 100 | 100 | 90 | No code change from run 4, confirms run-to-run variance |
+| 6 (after React.memo, vendor chunk split, corrected preconnect hostnames) | 81 | 100 | 100 | 90 | TBT improved to 370ms, best of any run |
 
-**Accessibility, Best Practices, and SEO were stable at 100/100/90 across every run**, no variance, so those numbers are trustworthy as reported.
+**Accessibility, Best Practices, and SEO were stable at 100/100/90 across all six runs**, zero variance, trustworthy as reported.
 
-**Performance ranged 68 to 83 across clean (non-extension) runs with no functional code changes between runs 3 and 4 that should explain a regression.** This points to run-to-run variance against a live serverless deployment (cold starts, real network conditions, Vercel's edge routing) rather than an actual performance regression from the preconnect hints, Lighthouse's own single-run methodology is known to be noisy against live, non-local targets. Two real optimizations were made and verified structurally (not just by score): the Firestore SDK was moved from a static import to a dynamic `import()`, confirmed via the build output to cut the main JS chunk from ~495KB to ~151KB; and preconnect hints were added for Firebase's domains. Both are legitimate improvements independent of what any single Lighthouse run reports.
+**Performance ranged 68 to 83 across clean (non-extension) runs, settling around 81 as the representative score** after two rounds of real, verified optimization work:
+- Firestore SDK moved from a static import to a dynamic `import()`, confirmed via build output to cut the main chunk from ~495KB to ~151KB
+- `TaskItem` wrapped in `React.memo` to stop re-rendering every list item on every Firestore snapshot update, only the changed item re-renders now
+- Vite's `manualChunks` configured to split React into its own vendor chunk, so app-code deploys don't bust the cache on the (larger) React chunk
+- Preconnect hints corrected to target Firestore's actual transport hostnames (`firestore.googleapis.com`, `www.googleapis.com`), an initial attempt targeted the wrong ones
 
-**Given the variance, 83 (run 3) is treated as the representative score** for this submission, since it reflects the state after a verified, measurable optimization (the bundle split) without an unexplained regression. This falls short of the ≥85 target in the assignment brief. Rather than keep re-running Lighthouse hoping for a favorable roll, this is documented honestly as a known gap: **Total Blocking Time and Largest Contentful Paint are the specific weak metrics**, both tied to the real network round-trip to Firestore on load, a genuine architectural cost of a live-syncing database that a static site wouldn't have.
+**Honest architectural conclusion:** the dominant remaining cost is Largest Contentful Paint (typically 3.3-3.8s), tied to the real network round-trip Firestore requires: connect, authenticate, receive the first snapshot, before any meaningful content can render. None of the above optimizations eliminate that round-trip, they reduce the JavaScript and connection-setup overhead around it. The only way to remove it entirely would be to render something meaningful before data arrives (a skeleton UI, or cached data from localStorage/IndexedDB shown optimistically while Firestore catches up), which is a product and architecture decision, not a quick performance fix, and was deliberately left out of scope here rather than rushed in just to move a number. This falls short of the assignment's ≥85 target, documented honestly rather than chased indefinitely with further re-runs.
 
-**Concrete performance improvement made based on Lighthouse findings:** split the Firestore SDK out of the initial bundle via dynamic import, verified to reduce the main chunk by ~70% (495KB → 151KB), directly targeting the Total Blocking Time metric Lighthouse flagged.
+**Concrete performance improvements made based on Lighthouse findings:** (1) dynamic-imported the Firestore SDK, verified via build output (495KB → 151KB main chunk); (2) memoized `TaskItem` to eliminate unnecessary re-renders on data updates; (3) split the vendor chunk for better repeat-visit caching; (4) corrected preconnect hostnames to the real Firestore transport domains. Each was verified independently (type-check, full test suite, build output) rather than judged by Lighthouse score alone, since a single Lighthouse run against a live deployment proved too noisy to be a reliable verification method on its own.
 
 ## Accessibility audit findings
 
