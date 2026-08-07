@@ -5,9 +5,9 @@
 - [x] `npm run build` completes with no errors
 - [x] `npx tsc --noEmit` passes with no type errors
 - [x] `npm test` passes (16/16)
-- [ ] Firestore security rules reviewed (currently test mode, open read/write; acceptable for this capstone's scope, flagged as a known limitation, not silently ignored)
-- [ ] `GEMINI_API_KEY` added to Vercel project environment variables (never committed to the repo, never in `.env.example` beyond a blank placeholder)
-- [ ] Firebase config values added to Vercel project environment variables (`VITE_FIREBASE_*`)
+- [x] Firestore security rules reviewed (currently test mode, open read/write; acceptable for this capstone's scope, flagged as a known limitation, not silently ignored)
+- [x] `GEMINI_API_KEY` added to Vercel project environment variables (never committed to the repo, never in `.env.example` beyond a blank placeholder)
+- [x] Firebase config values added to Vercel project environment variables (`VITE_FIREBASE_*`)
 
 ## Deploy
 
@@ -79,5 +79,5 @@ This is a small app with no database migrations and no build-time secrets baked 
 ## Sign-off
 
 Deployed by: Emmanuel Chukwukere Obinna
-Date: _(fill in)_
+Date: _(7/August/2026)_
 Live URL: _(https://backlog-tracker-app.vercel.app/)_

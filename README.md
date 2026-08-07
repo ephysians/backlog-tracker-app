@@ -11,12 +11,10 @@ A small React + TypeScript app for triaging a frontend work backlog: not just a 
 **Why this idea:** it's the same problem framing as my own portfolio work this internship, clearing a frontend backlog, so building the tool itself doubles as proof of the claim.
 
 ## Live app
-
-`[fill in your Vercel URL after deployment]`
+https://backlog-tracker-app.vercel.app
 
 ## Repository
-
-`[fill in your GitHub URL]`
+https://github.com/ephysians/backlog-tracker-app
 
 ## Setup & run
 
