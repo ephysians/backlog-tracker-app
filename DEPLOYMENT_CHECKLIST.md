@@ -52,9 +52,19 @@ Six runs were taken across two rounds of performance optimization:
 
 ## Accessibility audit findings
 
-_(fill in after running axe or WAVE)_
+Tool: axe DevTools (Pro), full-page scan against the live URL, WCAG 2.1 AA ruleset.
 
-**One concrete improvement made based on audit findings:**
+**First scan: 10 issues, all "Serious," all the same root cause** — insufficient color contrast:
+- `.task-item__age`, `.task-item__priority`, `.task-item__delete` text (`#8a8f9c` on `#f4f2ec` light card background): 2.89:1, needed 4.5:1
+- Urgent count in the summary bar (`#e4572e` on `#1d2028` dark background): 4.42:1, needed 4.5:1
+
+Root cause: the muted gray and urgent orange were each color-checked against one background context (the dark page background) and then reused on the light task-card background without re-checking contrast there.
+
+**Fix:** added a dedicated `--muted-on-light` variable for text on the light panel, brightened `--urgent` for text-on-dark contexts, and added a separate `--urgent-badge-bg` for white-text-on-urgent contexts (brightening `--urgent` for the first fix would have broken the second). Two additional failures were caught proactively, not by axe, since axe can only scan what's currently rendered: the stale badge (no stale task existed at scan time to render it) and the delete button's hover state (not triggered by an automated scan). Both fixed the same way, verified visually by temporarily forcing a stale state and confirming the white-on-orange badge read clearly.
+
+**Re-scan after fix: 0 issues.**
+
+**Concrete improvement made based on audit findings:** replaced context-blind color reuse with purpose-specific contrast-checked variables (`--muted-on-light`, `--urgent-badge-bg`), fixing 10 flagged violations plus 2 additional ones the scan couldn't see yet, all verified against WCAG AA's 4.5:1 threshold by calculation, then confirmed with a clean re-scan.
 
 ## How this app fails safely
 
