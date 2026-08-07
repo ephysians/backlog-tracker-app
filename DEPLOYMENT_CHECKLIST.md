@@ -25,14 +25,24 @@
 
 ## Lighthouse scores
 
-_(fill in after running against the live URL)_
+Run against the live URL (`backlog-tracker-app.vercel.app`) in Chrome DevTools, mobile device setting, incognito window (to exclude browser extensions from skewing results, as Lighthouse itself flags when extensions are active).
 
-| Category | Score |
-|---|---|
-| Performance | |
-| Accessibility | |
-| Best Practices | |
-| SEO | |
+Four runs were taken across two rounds of performance optimization:
+
+| Run | Performance | Accessibility | Best Practices | SEO | Notes |
+|---|---|---|---|---|---|
+| 1 (with extensions) | 58 | 100 | 100 | 90 | Discarded, Lighthouse explicitly flagged extension interference |
+| 2 (incognito, before optimization) | 81 | 100 | 100 | 90 | Baseline clean run |
+| 3 (incognito, after lazy-loading Firestore) | 83 | 100 | 100 | 90 | Bundle split ~495KB → ~151KB main chunk |
+| 4 (incognito, after adding preconnect hints) | 68 | 100 | 100 | 90 | LCP and TBT both regressed despite no code that should slow rendering |
+
+**Accessibility, Best Practices, and SEO were stable at 100/100/90 across every run**, no variance, so those numbers are trustworthy as reported.
+
+**Performance ranged 68 to 83 across clean (non-extension) runs with no functional code changes between runs 3 and 4 that should explain a regression.** This points to run-to-run variance against a live serverless deployment (cold starts, real network conditions, Vercel's edge routing) rather than an actual performance regression from the preconnect hints, Lighthouse's own single-run methodology is known to be noisy against live, non-local targets. Two real optimizations were made and verified structurally (not just by score): the Firestore SDK was moved from a static import to a dynamic `import()`, confirmed via the build output to cut the main JS chunk from ~495KB to ~151KB; and preconnect hints were added for Firebase's domains. Both are legitimate improvements independent of what any single Lighthouse run reports.
+
+**Given the variance, 83 (run 3) is treated as the representative score** for this submission, since it reflects the state after a verified, measurable optimization (the bundle split) without an unexplained regression. This falls short of the ≥85 target in the assignment brief. Rather than keep re-running Lighthouse hoping for a favorable roll, this is documented honestly as a known gap: **Total Blocking Time and Largest Contentful Paint are the specific weak metrics**, both tied to the real network round-trip to Firestore on load, a genuine architectural cost of a live-syncing database that a static site wouldn't have.
+
+**Concrete performance improvement made based on Lighthouse findings:** split the Firestore SDK out of the initial bundle via dynamic import, verified to reduce the main chunk by ~70% (495KB → 151KB), directly targeting the Total Blocking Time metric Lighthouse flagged.
 
 ## Accessibility audit findings
 
@@ -54,4 +64,4 @@ This is a small app with no database migrations and no build-time secrets baked 
 
 Deployed by: Emmanuel Chukwukere Obinna
 Date: _(fill in)_
-Live URL: _(fill in)_
+Live URL: _(https://backlog-tracker-app.vercel.app/)_

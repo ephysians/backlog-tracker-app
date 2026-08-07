@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Backlog Tracker</title>
+    <!-- Firestore connects to these origins on every load; preconnecting
+         eliminates the DNS + TCP + TLS setup time from the critical path,
+         which directly reduces LCP when the first data fetch is the bottleneck. -->
+    <link rel="preconnect" href="https://firestore.googleapis.com" />
+    <link rel="preconnect" href="https://www.googleapis.com" />
+    <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+    <link rel="dns-prefetch" href="https://www.googleapis.com" />
   </head>
   <body>
     <div id="root"></div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { Priority } from "../types/task";
 
 interface TriageResult {
@@ -11,7 +11,7 @@ export function useTriage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const suggest = async (rawTitle: string): Promise<TriageResult | null> => {
+  const suggest = useCallback(async (rawTitle: string): Promise<TriageResult | null> => {
     setLoading(true);
     setError(null);
     try {
@@ -32,7 +32,7 @@ export function useTriage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return { suggest, loading, error };
 }

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Task } from '../types/task';
 import { ageInDays, isStale } from '../lib/backlogStats';
 
@@ -7,7 +8,7 @@ interface TaskItemProps {
   onDelete: (id: string) => Promise<void>;
 }
 
-export function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
+export const TaskItem = memo(function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
   const stale = isStale(task);
 
   return (
@@ -34,4 +35,4 @@ export function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
       </button>
     </li>
   );
-}
+});
