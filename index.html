@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Backlog Tracker</title>
+    <!-- Preconnect to Firestore's domains so DNS/TLS negotiation happens in
+         parallel with page load instead of only starting once the lazily-
+         loaded Firestore chunk finishes executing. Real network round-trip
+         to Firestore was the main contributor to a 3.3s LCP; this doesn't
+         eliminate that round-trip, but it removes the connection setup time
+         that would otherwise stack in front of it. -->
+    <link rel="preconnect" href="https://firestore.googleapis.com" />
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
   </head>
   <body>
     <div id="root"></div>
