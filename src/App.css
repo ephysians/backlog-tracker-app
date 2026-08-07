@@ -8,9 +8,23 @@
   --panel: #f4f2ec;
   --panel-ink: #1b1d23;
   --muted: #8a8f9c;
+  /* --muted was tuned for the dark page background (--bg) and only checked
+     there. Reused as-is on the light task-card panel (--panel), it fails
+     WCAG AA: axe measured 2.89:1 against #f4f2ec, needs 4.5:1. This darker
+     variant is for text on the light panel specifically. */
+  --muted-on-light: #52565f;
   --low: #6b8f71;
   --normal: #3d5a80;
-  --urgent: #e4572e;
+  /* Brightened from #e4572e: the original measured 4.42:1 on the dark
+     summary-stat background, just under the 4.5:1 AA threshold axe flagged.
+     This passes at ~5.05:1 against --bg/#1d2028-toned surfaces. */
+  --urgent: #f0623a;
+  /* Separate, darker value for contexts with white text on an urgent
+     background (the stale badge): brightening --urgent above for text
+     contrast would have broken white-on-urgent contrast in the other
+     direction, so that case needs its own darker fill instead of reusing
+     --urgent as a background color. */
+  --urgent-badge-bg: #b23a1e;
   --focus: #7c9cff;
 }
 
@@ -106,9 +120,31 @@ body {
   cursor: pointer;
 }
 
+.task-form__ai-btn {
+  padding: 0.65rem 1.1rem;
+  border: 1px solid var(--focus);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--focus);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.task-form__ai-btn:disabled,
 .task-form button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.task-form__suggestion {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace;
+}
+
+.task-form__suggestion--error {
+  color: var(--urgent);
 }
 
 .state-message {
@@ -190,13 +226,13 @@ body {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--muted);
+  color: var(--muted-on-light);
 }
 
 .task-item__delete {
   background: none;
   border: 1px solid transparent;
-  color: var(--muted);
+  color: var(--muted-on-light);
   border-radius: 4px;
   padding: 0.3rem 0.5rem;
   cursor: pointer;
@@ -204,14 +240,18 @@ body {
 }
 
 .task-item__delete:hover {
-  color: var(--urgent);
-  border-color: var(--urgent);
+  /* --urgent was brightened for text-on-dark contrast (see :root), which
+     drops it below 4.5:1 on this light panel background. The badge fill
+     is darker and passes here too (~5.3:1), so reuse it instead of adding
+     a third variable for the same "urgent, but on light" need. */
+  color: var(--urgent-badge-bg);
+  border-color: var(--urgent-badge-bg);
 }
 
 .task-item__age {
   font-family: ui-monospace, 'JetBrains Mono', Consolas, monospace;
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--muted-on-light);
   flex-shrink: 0;
 }
 
@@ -220,7 +260,7 @@ body {
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  background: var(--urgent);
+  background: var(--urgent-badge-bg);
   color: #fff;
   padding: 0.1rem 0.4rem;
   border-radius: 3px;
@@ -228,7 +268,7 @@ body {
 }
 
 .task-item.stale:not(.done) {
-  box-shadow: inset 0 0 0 1px rgba(228, 87, 46, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(240, 98, 58, 0.4);
 }
 
 .backlog-summary {
